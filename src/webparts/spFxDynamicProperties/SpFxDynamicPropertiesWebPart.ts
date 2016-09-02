@@ -2,17 +2,75 @@ import {
   BaseClientSideWebPart,
   IPropertyPaneSettings,
   IWebPartContext,
-  PropertyPaneTextField
+  PropertyPaneTextField,
+  PropertyPaneDropdown,
+  IPropertyPaneDropdownOption
 } from '@microsoft/sp-client-preview';
 
 import styles from './SpFxDynamicProperties.module.scss';
 import * as strings from 'spFxDynamicPropertiesStrings';
 import { ISpFxDynamicPropertiesWebPartProps } from './ISpFxDynamicPropertiesWebPartProps';
+import MockHttpClient from './MockHttpClient';
+import { EnvironmentType } from '@microsoft/sp-client-base';
+
+export interface ISPLists {
+  value: ISPList[];
+}
+
+export interface ISPList {
+  Title: string;
+  Id: string;
+}
 
 export default class SpFxDynamicPropertiesWebPart extends BaseClientSideWebPart<ISpFxDynamicPropertiesWebPartProps> {
 
   public constructor(context: IWebPartContext) {
     super(context);
+  }
+
+  private init(): void {
+    if (this.context.environment.type === EnvironmentType.Local) {
+    this._getMockListData().then((response) => {
+      this.lists = response.value.map((list: ISPList) => {
+        return {
+          key: list.Id,
+          text: list.Title
+        };
+      });
+    }); }
+    else {
+    this._getListData()
+      .then((response) => {
+        this.lists = response.value.map((list: ISPList) => {
+        return {
+          key: list.Id,
+          text: list.Title
+        };
+      });
+      });
+    }
+  }
+
+  private _getMockListData(): Promise<ISPLists> {
+    return MockHttpClient.get(this.context.pageContext.web.absoluteUrl).then(() => {
+        const listData: ISPLists = {
+            value:
+            [
+                { Title: 'Mock List One', Id: '1' },
+                { Title: 'Mock List Two', Id: '2' },
+                { Title: 'Mock List Three', Id: '3' }
+            ]
+            };
+
+        return listData;
+    }) as Promise<ISPLists>;
+  }
+
+  private _getListData(): Promise<ISPLists> {
+  return this.context.httpClient.get(this.context.pageContext.web.absoluteUrl + `/_api/web/lists?$filter=Hidden eq false`)
+      .then((response: Response) => {
+      return response.json();
+      });
   }
 
   public render(): void {
@@ -31,8 +89,11 @@ export default class SpFxDynamicPropertiesWebPart extends BaseClientSideWebPart<
           </div>
         </div>
       </div>`;
+
+    this.init();
   }
 
+  private lists: IPropertyPaneDropdownOption[] = [];
   protected get propertyPaneSettings(): IPropertyPaneSettings {
     return {
       pages: [
@@ -46,6 +107,10 @@ export default class SpFxDynamicPropertiesWebPart extends BaseClientSideWebPart<
               groupFields: [
                 PropertyPaneTextField('description', {
                   label: strings.DescriptionFieldLabel
+                }),
+                PropertyPaneDropdown('list', {
+                  label: 'Choose list',
+                  options: this.lists
                 })
               ]
             }
