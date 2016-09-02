@@ -1,0 +1,10 @@
+{
+  "solution": {
+    "name": "sp-fx-dynamic-properties-client-side-solution",
+    "id": "3e5288cf-af7a-4c4b-829b-1dfed6d66b62",
+    "version": "1.0.0.0"
+  },
+  "paths": {
+    "zippedPackage": "sp-fx-dynamic-properties.spapp"
+  }
+}

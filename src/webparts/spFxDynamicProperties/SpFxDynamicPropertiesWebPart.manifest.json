@@ -1,0 +1,19 @@
+{
+  "$schema": "../../../node_modules/@microsoft/sp-module-interfaces/lib/manifestSchemas/jsonSchemas/clientSideComponentManifestSchema.json",
+
+  "id": "fb599bc1-7f56-44f0-b2bf-33833578f38c",
+  "componentType": "WebPart",
+  "version": "0.0.1",
+  "manifestVersion": 2,
+
+  "preconfiguredEntries": [{
+    "groupId": "fb599bc1-7f56-44f0-b2bf-33833578f38c",
+    "group": { "default": "Under Development" },
+    "title": { "default": "SpFxDynamicProperties" },
+    "description": { "default": "SPFx-dynamic-properties description" },
+    "officeFabricIconFontName": "Page",
+    "properties": {
+      "description": "SpFxDynamicProperties"
+    }
+  }]
+}
